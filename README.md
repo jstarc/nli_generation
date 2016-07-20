@@ -46,6 +46,7 @@ You can generate hypotheses by specifying your own premises and labels in the in
 
 ```python
 In [1]: run -i experiment.py load_gen 8 150 4
+```
 Using Theano backend.
 Loading training data
 Loading dev data
@@ -54,12 +55,15 @@ Data loaded
 Transforming finished
 Word vec preparation finished
 Dataset created
-
+```python
 In [2]: import visualize
-
+```
+```python
 In [3]: premise = visualize.load_sentence('two children playing on the floor with toy trains .', wi, prem_len)
-
+```
+```python
 In [4]: visualize.print_hypos(premise, 2, gtest, 8, hypo_len, latent_size, wi)
+```
 Premise: two children playing on the floor with toy trains .
 Label: entailment
 
@@ -73,7 +77,9 @@ children are playing with toys .
 there are people outside playing .
 two children are playing on the floor
 
+```python
 In [5]: visualize.print_hypos(premise, 1, gtest, 8, hypo_len, latent_size, wi)
+```
 Premise: two children playing on the floor with toy trains .
 Label: contradiction
 
@@ -87,5 +93,5 @@ two kids are outside .
 two men are eating a sandwich outside .
 the two children are playing with each other .
 
-```
+
 
