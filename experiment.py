@@ -16,14 +16,15 @@ if __name__ == "__main__":
     train, dev, test, wi, glove, prem_len, hypo_len = load_data.main()
     
     method = sys.argv[1]
+    version = int(sys.argv[2])
+    g_hidden_size = int(sys.argv[3])
+    latent_size = int(sys.argv[4])
+
     c_hidden_size = 150
     a_hidden_size = 150
-    g_hidden_size = int(sys.argv[3]) 
     beam_size = 1
-    version = int(sys.argv[2])
     batch_size = 64
     gen_epochs = 20
-    latent_size = int(sys.argv[4])
     div_per_premise = 64
     div_samples = 32
     augment_file_size = 2 ** 15
@@ -33,10 +34,15 @@ if __name__ == "__main__":
     dev_sample_size = (len(dev[0]) / batch_size) * batch_size
 
     dir_name = 'models/real' + str(version) + '-' + str(g_hidden_size) + '-' + str(latent_size)
-
+    
+    orig_cmodel_dir = 'models/cmodel/'
     cmodel = cm.attention_model(c_hidden_size, glove)
-    cmodel.load_weights('models/cmodel/model.weights')
-
+    if os.path.exists(orig_cmodel_dir):
+       cmodel.load_weights(orig_cmodel_dir + 'model.weights')
+    
+    if method == 'orig_class':
+        ca.train(train, dev, cmodel, orig_cmodel_dir, batch_size)
+    
     if method == 'train_gen':
         gtrain = gm.gen_train(len(train[0]), g_hidden_size, latent_size, glove, hypo_len, version)
         ga.train(train, dev, gtrain, dir_name, batch_size, glove, beam_size, 
@@ -63,25 +69,11 @@ if __name__ == "__main__":
            aug_cmodel = cm.attention_model(c_hidden_size, glove)
            ca.train(aug_train, aug_dev, aug_cmodel, dir_name + '/threshold' + str(t), batch_size)
 
-    if method == 'train_adverse':
+    if method == 'train_discriminator':
         aug_train, aug_dev = augment.load_dataset(dir_name, 0.0, len(train[0]), len(dev[0]), wi, prem_len, hypo_len)
         aa.adverse_model_train(dir_name, train, aug_train, dev, aug_dev, a_hidden_size, glove)
       
-    if method == 'evaluate_class':
-        csvf =  open(dir_name + '/eval.csv', 'wb')
-        writer = csv.writer(csvf)
-        writer.writerow(['threshold', 'loss_dev', 'acc_dev', 'loss_test', 'acc_test'])
-        aug_cmodel = cm.attention_model(c_hidden_size, glove)
-        for t in thresholds:
-            filename = dir_name + '/threshold' + str(t) + '/model.weights'
-            if os.path.isfile(filename):
-                aug_cmodel.load_weights(filename)
-                loss_dev, acc_dev, = aug_cmodel.evaluate([dev[0], dev[1]], dev[2])
-                loss_test, acc_test = aug_cmodel.evaluate([test[0], test[1]], test[2])
-                writer.writerow([str(t), "%0.4f" % loss_dev, "%0.4f" % acc_dev,
-                                 "%0.4f" % loss_test, "%0.4f" % acc_test])
-
-    if method == 'evaluate_gen':
+    if method == 'evaluate':
         csvf =  open(dir_name + '/total_eval.csv', 'wb')
         writer = csv.writer(csvf)
         writer.writerow(['threshold', 'total_params', 'atrain_params', 'class_loss', 'class_entropy', 'class_acc', 'neutr_acc', 
@@ -124,5 +116,9 @@ if __name__ == "__main__":
                    loss_dev, acc_dev, loss_test, acc_test, aug_dev_acc, avg_loss]
             str_row = [str(t)] + ["%0.4f" % stat for stat in row[1:]]
             writer.writerow(str_row)           
+    if method == 'load_gen':
+        gtrain = gm.gen_train(len(train[0]), g_hidden_size, latent_size, glove, hypo_len, version)
+        gtrain.load_weights(dir_name + '/weights.hdf5')
+        gtest = gm.gen_test(gtrain, glove, batch_size)
 
             

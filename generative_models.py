@@ -136,11 +136,11 @@ def gen_test(train_model, glove, batch_size):
     
     hypo_embeddings = make_fixed_embeddings(glove, 1)(hypo_input) 
     
-    hypo_layer = LSTM(output_dim = hidden_size, return_sequences=True, stateful = True, unroll=True,
+    hypo_layer = LSTM(output_dim = hidden_size, return_sequences=True, stateful = True, unroll=False,
             trainable = False, inner_activation='sigmoid', name='hypo')(hypo_embeddings)
     
     att_inputs = [hypo_layer, premise_input] if version == 5 else [hypo_layer, premise_input, creative_input] 
-    attention = LstmAttentionLayer(output_dim=hidden_size, return_sequences=True, stateful = True, unroll =True,
+    attention = LstmAttentionLayer(output_dim=hidden_size, return_sequences=True, stateful = True, unroll =False,
         trainable = False, feed_state = False, name='attention') \
             (att_inputs)
 

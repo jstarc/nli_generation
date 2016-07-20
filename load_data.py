@@ -348,7 +348,10 @@ def main():
     return train, dev, test, wi, glove, prem_len, hypo_len    
     
 if __name__ == "__main__":
-    train, dev, test, wi, glove, prem_len, hypo_len = main()
+    if len(sys.argv) > 1 and sys.argv[1] == 'repackage':
+        repackage_glove('data/glove.6B.50d.txt', 'data/snli_vectors.txt', 'data/snli_1.0/')        
+    else:
+        train, dev, test, wi, glove, prem_len, hypo_len = main()
 
     
 

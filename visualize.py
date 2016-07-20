@@ -34,15 +34,17 @@ def print_hypos(premise, label, gen_test, beam_size, hypo_len, noise_size, wi):
     words, loss = generative_predict_beam(gen_test, premises, noise_input,
                              class_indices, True, hypo_len)
     
-    print wi.print_seq(premise)
+    print 'Premise:', wi.print_seq(premise)
+    print 'Label:', load_data.LABEL_LIST[label]
     print 
+    print 'Hypotheses:'
     for h in words:
         print wi.print_seq(h)
 
 def load_sentence(string, wi, len = 25):
     tokens = string.split()
     tokens = load_word_indices(tokens, wi.index)
-    return pad_sequences([tokens], maxlen = prem_len, padding = 'pre')[0]
+    return pad_sequences([tokens], maxlen = len, padding = 'pre')[0]
     
 
 def find_true_examples():
