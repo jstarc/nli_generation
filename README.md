@@ -1,7 +1,7 @@
 #Natural Language Inference Dataset Generation
 
-Code for the paper "Constructing a Natural Language Inference Dataset using Generative
-Neural Networks" (Starc and Mladenic, 2016)
+Code for the paper "[Constructing a Natural Language Inference Dataset using Generative
+Neural Networks](http://arxiv.org/abs/1607.06025)" (Starc and Mladenic, 2016)
 
 
 ## Dependencies
